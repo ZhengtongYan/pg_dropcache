@@ -22,7 +22,10 @@ Datum
 pg_drop_rel_cache(PG_FUNCTION_ARGS)
 {
 	Oid			relid = PG_GETARG_OID(0);
-	int			forkNum;
+	//int			forkNum;
+	ForkNumber forkNum[5];
+	int nforks=MAX_FORKNUM;
+	BlockNumber firstDelBlock[] = {0};
 	HeapTuple	tp;
 	RelFileNodeBackend	rnode;
 
@@ -46,9 +49,11 @@ pg_drop_rel_cache(PG_FUNCTION_ARGS)
 		PG_RETURN_VOID();
 	}
 
-	forkNum = PG_ARGISNULL(1) ? 0 : forkname_to_number(text_to_cstring(PG_GETARG_TEXT_P(1)));
-	for (; forkNum <= MAX_FORKNUM; ++forkNum)
-		DropRelFileNodeBuffers(rnode, forkNum, 0);
+	//forkNum = PG_ARGISNULL(1) ? 0 : forkname_to_number(text_to_cstring(PG_GETARG_TEXT_P(1)));
+	//for (; forkNum <= MAX_FORKNUM; ++forkNum)
+	//	DropRelFileNodeBuffers(rnode, forkNum, 0);
+	*forkNum = PG_ARGISNULL(1) ? 0 : forkname_to_number(text_to_cstring(PG_GETARG_TEXT_P(1)));
+	DropRelFileNodeBuffers(rnode, forkNum, nforks,firstDelBlock);
 
 	PG_RETURN_VOID();
 }
